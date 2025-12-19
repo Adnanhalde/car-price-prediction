@@ -1,17 +1,34 @@
-# Car Price Prediction App 🚗
+# 🚗 Car Price Prediction App
 
-A machine learning-powered web application that predicts car prices based on various features.
+A machine learning web application that predicts car prices based on various features.
 
-## Features
-- Predict car prices in Indian Rupees
-- User-friendly Streamlit interface
-- Real-time price estimation
-- Insights based on car specifications
-- Support for various car types and fuel options
+![Streamlit](https://img.shields.io/badge/Streamlit-FF4B4B?style=for-the-badge&logo=Streamlit&logoColor=white)
+![Scikit-learn](https://img.shields.io/badge/scikit--learn-%23F7931E.svg?style=for-the-badge&logo=scikit-learn&logoColor=white)
+![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54)
 
-## Installation
+## 🌐 Live Demo
+[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://your-app-name.streamlit.app)
 
-1. Clone or download this project
-2. Install required packages:
+## 📋 Features
+- Predict car prices instantly
+- User-friendly web interface
+- 7 input parameters for accurate predictions
+- Price display in both thousands and lakhs
+- Market insights and analysis
+
+## 🚀 Quick Start
+
+### Local Installation
 ```bash
+# Clone the repository
+git clone https://github.com/your-username/car-price-prediction.git
+cd car-price-prediction
+
+# Install dependencies
 pip install -r requirements.txt
+
+# Train the model (creates .pkl files locally)
+python train_model.py
+
+# Run the app
+streamlit run app.py
