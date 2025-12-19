@@ -3,15 +3,17 @@ import pandas as pd
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.preprocessing import StandardScaler
 import joblib
+import os
 
-print("🚗 Training car price prediction model...")
+print("=" * 60)
+print("🚗 CAR PRICE PREDICTION MODEL TRAINER")
+print("=" * 60)
 
 # Set random seed for reproducibility
 np.random.seed(42)
 
-# Generate synthetic car data
+print("📊 Step 1: Generating synthetic car data...")
 n_samples = 2000
-print(f"Generating {n_samples} synthetic car samples...")
 
 # Generate features
 manufacturing_year = np.random.randint(2000, 2024, n_samples)
@@ -22,8 +24,8 @@ fuel_types = np.random.choice(['Petrol', 'Diesel', 'Hybrid', 'Electric'], n_samp
 transmission_types = np.random.choice(['Manual', 'Automatic'], n_samples, p=[0.4, 0.6])
 owner_count = np.random.choice([1, 2, 3, 4, 5], n_samples, p=[0.4, 0.3, 0.15, 0.1, 0.05])
 
+print("📊 Step 2: Calculating prices...")
 # Create price based on features
-age = 2024 - manufacturing_year
 base_price = (
     2000 * (2024 - manufacturing_year) +  # Depreciation with age
     -0.03 * mileage_km +                 # Depreciation with mileage
@@ -54,9 +56,13 @@ price_thousands = (base_price + transmission_bonus - owner_discount) / 1000
 price_thousands = np.maximum(price_thousands, 50)
 price_thousands = np.minimum(price_thousands, 2000)
 
+print("📊 Step 3: Preprocessing data...")
 # Convert categorical to numerical for modeling
-fuel_type_encoded = pd.factorize(fuel_types)[0]
-transmission_encoded = pd.factorize(transmission_types)[0]
+fuel_mapping = {'Petrol': 0, 'Diesel': 1, 'Hybrid': 2, 'Electric': 3}
+transmission_mapping = {'Manual': 0, 'Automatic': 1}
+
+fuel_type_encoded = np.array([fuel_mapping[ft] for ft in fuel_types])
+transmission_encoded = np.array([transmission_mapping[tt] for tt in transmission_types])
 
 # Create feature matrix
 X = np.column_stack([
@@ -71,10 +77,12 @@ X = np.column_stack([
 
 y = price_thousands
 
+print("📊 Step 4: Scaling features...")
 # Scale features
 scaler = StandardScaler()
 X_scaled = scaler.fit_transform(X)
 
+print("📊 Step 5: Training model...")
 # Train model
 model = RandomForestRegressor(
     n_estimators=100,
@@ -89,30 +97,46 @@ score = model.score(X_scaled, y)
 print(f"✅ Model trained successfully!")
 print(f"📊 Model R² score: {score:.3f}")
 
+print("📊 Step 6: Saving files...")
 # Save model and scaler
 joblib.dump(model, 'car_price_model.pkl')
+print("   ✓ car_price_model.pkl saved")
+
 joblib.dump(scaler, 'car_scaler.pkl')
+print("   ✓ car_scaler.pkl saved")
 
 # Save feature names and mappings
 feature_info = {
     'feature_names': ['manufacturing_year', 'mileage_km', 'engine_size_cc', 
                      'horsepower', 'fuel_type', 'transmission', 'owner_count'],
-    'fuel_mapping': dict(enumerate(['Petrol', 'Diesel', 'Hybrid', 'Electric'])),
-    'transmission_mapping': dict(enumerate(['Manual', 'Automatic']))
+    'fuel_mapping': fuel_mapping,
+    'transmission_mapping': transmission_mapping
 }
 joblib.dump(feature_info, 'feature_info.pkl')
+print("   ✓ feature_info.pkl saved")
 
 # Test prediction
 sample_features = np.array([[2018, 50000, 1500, 120, 0, 1, 1]])  # 2018 Petrol Automatic, 1 owner
 sample_scaled = scaler.transform(sample_features)
 sample_prediction = model.predict(sample_scaled)[0]
 
-print(f"📝 Sample prediction for 2018 car with 50,000 km:")
-print(f"   Estimated Price: ₹{sample_prediction:,.2f} thousand")
-print(f"   (Approximately ₹{sample_prediction/100:.2f} Lakhs)")
+print("\n" + "=" * 60)
+print("🎯 SAMPLE PREDICTION")
+print("=" * 60)
+print(f"Car: 2018, 50,000 km, 1500cc, 120HP")
+print(f"Fuel: Petrol, Transmission: Automatic, Owners: 1")
+print(f"Estimated Price: ₹{sample_prediction:,.2f} thousand")
+print(f"Approximately: ₹{sample_prediction/100:.2f} Lakhs")
 
-print("\n✅ All files saved:")
-print("   - car_price_model.pkl (trained model)")
-print("   - car_scaler.pkl (feature scaler)")
-print("   - feature_info.pkl (feature mappings)")
-print("\n🎯 Now you can run the app with: streamlit run app.py")
+print("\n" + "=" * 60)
+print("✅ ALL FILES CREATED SUCCESSFULLY!")
+print("=" * 60)
+print("\n🎯 NOW RUN THE APP WITH:")
+print("   streamlit run app.py")
+print("\n📁 Files in directory:")
+for file in ['car_price_model.pkl', 'car_scaler.pkl', 'feature_info.pkl']:
+    if os.path.exists(file):
+        print(f"   ✓ {file} ({os.path.getsize(file)/1024:.1f} KB)")
+    else:
+        print(f"   ✗ {file} (MISSING!)")
+print("\n")
